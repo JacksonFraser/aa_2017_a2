@@ -1,0 +1,7 @@
+-v
+-l log.txt
+H:\git\aa_2017_a2\config.txt
+H:\git\aa_2017_a2\loc1.txt 
+H:\git\aa_2017_a2\loc2.txt 
+random
+random
