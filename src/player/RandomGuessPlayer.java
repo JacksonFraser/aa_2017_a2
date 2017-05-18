@@ -1,51 +1,56 @@
 package player;
 
-import java.util.Scanner;
+import java.util.Random;
+
 import world.World;
 
 /**
- * Random guess player (task A).
- * Please implement this class.
+ * Random guess player (task A). Please implement this class.
  *
  * @author Youhan, Jeffrey
  */
-public class RandomGuessPlayer implements Player{
+public class RandomGuessPlayer implements Player {
 
-    @Override
-    public void initialisePlayer(World world) {
-        // To be implemented.
-    } // end of initialisePlayer()
+	@Override
+	public void initialisePlayer(World world) {
+		// To be implemented.
+	} // end of initialisePlayer()
 
-    @Override
-    public Answer getAnswer(Guess guess) {
-        // To be implemented.
+	@Override
+	public Answer getAnswer(Guess guess) {
+		// To be implemented.
 
-        // dummy return
-        return null;
-    } // end of getAnswer()
+		// dummy return
+		return null;
+	} // end of getAnswer()
 
+	@Override
+	public Guess makeGuess() {
+		Guess g = new Guess();
+		Random random = new Random();
+		int max = 9;
+		int min = 0;
 
-    @Override
-    public Guess makeGuess() {
-        // To be implemented.
+		int row = random.nextInt(max - min + 1) + min;
+		g.row = row;
 
-        // dummy return
-        return null;
-    } // end of makeGuess()
+		int col = random.nextInt(max - min + 1) + min;
+		g.column = col;
+		return g;
+		// dummy return
+	} // end of makeGuess()
 
+	@Override
+	public void update(Guess guess, Answer answer) {
+		// To be implemented.
+	} // end of update()
 
-    @Override
-    public void update(Guess guess, Answer answer) {
-        // To be implemented.
-    } // end of update()
+	@Override
+	public boolean noRemainingShips() {
+		// To be implemented.
 
-
-    @Override
-    public boolean noRemainingShips() {
-        // To be implemented.
-
-        // dummy return
-        return true;
-    } // end of noRemainingShips()
+		// dummy return
+		return false;
+	} // end of noRemainingShips()
 
 } // end of class RandomGuessPlayer
