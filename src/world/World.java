@@ -164,7 +164,7 @@ public class World {
         int d = offset * (numColumn + 1);
         if (isHex) {
             if (offset ==0) {
-                StdDraw.setCanvasSize(1800, 900);
+                StdDraw.setCanvasSize(1300, 700);
                 StdDraw.setXscale(-1, 2*(numColumn+1)+1);
                 StdDraw.setYscale(-1, numRow+1);
             }
@@ -201,7 +201,7 @@ public class World {
 
         } else {
             if (offset ==0) {
-                StdDraw.setCanvasSize(1800, 900);
+                StdDraw.setCanvasSize(1300, 700);
                 StdDraw.setXscale(-1, 2*(numColumn+1));
                 StdDraw.setYscale(-1, numRow+1);
             }
