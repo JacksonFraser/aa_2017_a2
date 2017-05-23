@@ -1,7 +1,0 @@
--v
--l log.txt
-/aa_a2/config.txt
-/aa_a2/loc1.txt 
-/aa_a2/loc2.txt 
-random
-random
