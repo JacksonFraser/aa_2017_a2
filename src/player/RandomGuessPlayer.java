@@ -27,18 +27,28 @@ public class RandomGuessPlayer implements Player {
 	public void initialisePlayer(World world) {
 		this.world = world;
 		playerShipList = world.shipLocations;
-		// To be implemented.
 	} // end of initialisePlayer()
 
 	@Override
 	public Answer getAnswer(Guess guess) {
 		Answer a = new Answer();
+		
+		//Searches individual ships
 		for(int i = 0; i < playerShipList.size(); ++i){
+			
+			//Searches individual ship coordinates 
 			for(int j = 0; j < playerShipList.get(i).coordinates.size(); ++j) {
 				int col = playerShipList.get(i).coordinates.get(j).column;
 				int row = playerShipList.get(i).coordinates.get(j).row;
+				
+				//Remove this point from the ship
 				if(col == guess.column && row == guess.row){
 					playerShipList.get(i).coordinates.remove(j);
+					
+					/*
+					 * if there are no more coordinates, then the ship has been sunk
+					 * and we remove it from the playerShipList
+					 * */
 					if(playerShipList.get(i).coordinates.size() == 0){
 						System.out.println(playerShipList.get(i).ship.name()+ " has been sunk");
 						a.shipSunk = playerShipList.get(i).ship;
@@ -50,7 +60,6 @@ public class RandomGuessPlayer implements Player {
 				}
 			}
 		}
-		// dummy return
 		return a;
 	} // end of getAnswer()
 
@@ -58,12 +67,11 @@ public class RandomGuessPlayer implements Player {
 	public Guess makeGuess() {
 		Guess g = possibleGuesses.pop();
 		return g;
-		// dummy return
 	} // end of makeGuess()
 
 	@Override
 	public void update(Guess guess, Answer answer) {
-		// To be implemented.
+		// No need to implement for RandomPlayer
 	} // end of update()
 
 	@Override
@@ -75,9 +83,10 @@ public class RandomGuessPlayer implements Player {
 			return false;
 		}
 
-		// dummy return
 	} // end of noRemainingShips()
-
+	
+	
+	//creates a deque of all possible guesses and then randomises them
 	public Deque<Guess> getShuffledGuesses() {
 		List<Guess> guessList = new ArrayList<>();
 		int max = 9;
