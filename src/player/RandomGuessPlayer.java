@@ -19,11 +19,13 @@ import world.World.ShipLocation;
  */
 public class RandomGuessPlayer implements Player {
 
+	private World world;
 	private Deque<Guess> possibleGuesses = getShuffledGuesses();
 	private ArrayList<ShipLocation> playerShipList = new ArrayList<>();
 
 	@Override
 	public void initialisePlayer(World world) {
+		this.world = world;
 		playerShipList = world.shipLocations;
 		// To be implemented.
 	} // end of initialisePlayer()
@@ -40,6 +42,9 @@ public class RandomGuessPlayer implements Player {
 					if(playerShipList.get(i).coordinates.size() == 0){
 						System.out.println(playerShipList.get(i).ship.name()+ " has been sunk");
 						a.shipSunk = playerShipList.get(i).ship;
+						playerShipList.remove(i);
+						a.isHit = true;
+						return a;
 					}
 					a.isHit = true;
 				}
@@ -63,10 +68,14 @@ public class RandomGuessPlayer implements Player {
 
 	@Override
 	public boolean noRemainingShips() {
-		// To be implemented.
+		if(playerShipList.size() == 0){
+			return true;
+		}
+		else{
+			return false;
+		}
 
 		// dummy return
-		return false;
 	} // end of noRemainingShips()
 
 	public Deque<Guess> getShuffledGuesses() {
