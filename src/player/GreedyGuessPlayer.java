@@ -100,6 +100,7 @@ public class GreedyGuessPlayer implements Player {
 				guessList.add(guess);
 			}
 		}
+		Collections.shuffle(guessList);
 
 		return guessList;
 	}
