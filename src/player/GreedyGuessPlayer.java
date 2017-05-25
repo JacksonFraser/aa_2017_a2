@@ -156,6 +156,8 @@ public class GreedyGuessPlayer implements Player {
 			};
 			
 		}
+		System.out.println("size of re:"+passGuesses.size());
+
 		return list;
 	}
 
