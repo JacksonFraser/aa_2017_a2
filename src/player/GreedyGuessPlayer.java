@@ -9,13 +9,18 @@ import world.World.ShipLocation;
 
 public class GreedyGuessPlayer implements Player {
 
-	private LinkedList<Guess> possibleGuesses = getGuesses();
+	private LinkedList<Guess> possibleGuesses;
 	private ArrayList<ShipLocation> playerShipList = new ArrayList<>();
 	private LinkedList<Guess> targetModeList = new LinkedList<Guess>();
+	private boolean start = false;
 
 	@Override
 	public void initialisePlayer(World world) {
 		playerShipList = world.shipLocations;
+    	possibleGuesses = getGuesses();
+    	System.out.println(possibleGuesses.size());
+
+
 	} // end of initialisePlayer()
 
 	@Override
@@ -50,7 +55,6 @@ public class GreedyGuessPlayer implements Player {
 
 	@Override
 	public Guess makeGuess() {
-
 		// Search through target mode unless it is empty
 		if (targetModeList.size() != 0) {
 			Guess g = targetModeList.pop();
@@ -65,8 +69,8 @@ public class GreedyGuessPlayer implements Player {
 	@Override
 	public void update(Guess guess, Answer answer) {
 
-		if (answer.isHit == true && targetModeList.size() == 0) {
-			targetModeList = createTargetModeList(guess.column, guess.row);
+		if (answer.isHit == true) {
+			targetModeList.addAll(createTargetModeList(guess.column, guess.row));
 		}
 
 		// To be implemented.
@@ -147,6 +151,7 @@ public class GreedyGuessPlayer implements Player {
 				guesses.remove(i);
 			}
 		}
+		Collections.shuffle(guesses);
 		return guesses;
 	}
 
