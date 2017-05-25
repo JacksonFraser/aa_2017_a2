@@ -50,7 +50,6 @@ public class RandomGuessPlayer implements Player {
 					 * and we remove it from the playerShipList
 					 * */
 					if(playerShipList.get(i).coordinates.size() == 0){
-						System.out.println(playerShipList.get(i).ship.name()+ " has been sunk");
 						a.shipSunk = playerShipList.get(i).ship;
 						playerShipList.remove(i);
 						a.isHit = true;

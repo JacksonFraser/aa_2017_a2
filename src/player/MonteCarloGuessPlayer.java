@@ -1,7 +1,10 @@
 package player;
 
+import java.util.ArrayList;
 import java.util.Scanner;
+
 import world.World;
+import world.World.ShipLocation;
 
 /**
  * Monte Carlo guess player (task C).
@@ -10,11 +13,14 @@ import world.World;
  * @author Youhan, Jeffrey
  */
 public class MonteCarloGuessPlayer  implements Player{
+	
+	private ArrayList<ShipLocation> playerShipList = new ArrayList<>();
 
-    @Override
+	@Override
     public void initialisePlayer(World world) {
-        // To be implemented.
-    } // end of initialisePlayer()
+        playerShipList = world.shipLocations;
+		
+	} // end of initialisePlayer()
 
     @Override
     public Answer getAnswer(Guess guess) {
@@ -36,7 +42,7 @@ public class MonteCarloGuessPlayer  implements Player{
 
     @Override
     public void update(Guess guess, Answer answer) {
-        // To be implemented.
+        
     } // end of update()
 
 

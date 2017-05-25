@@ -1,49 +1,41 @@
 package player;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
 
 import world.World;
-import world.World.Coordinate;
 import world.World.ShipLocation;
 
-/**
- * Random guess player (task A). Please implement this class.
- *
- * @author Youhan, Jeffrey
- */
 public class GreedyGuessPlayer implements Player {
 
-	private World world;
 	private LinkedList<Guess> possibleGuesses = getGuesses();
 	private ArrayList<ShipLocation> playerShipList = new ArrayList<>();
 	private LinkedList<Guess> targetModeList = new LinkedList<Guess>();
-	private String direction = "";
 
 	@Override
 	public void initialisePlayer(World world) {
-		this.world = world;
 		playerShipList = world.shipLocations;
-		// To be implemented.
 	} // end of initialisePlayer()
 
 	@Override
 	public Answer getAnswer(Guess guess) {
 		Answer a = new Answer();
+		// Searches individual ship coordinates
 		for (int i = 0; i < playerShipList.size(); ++i) {
 			for (int j = 0; j < playerShipList.get(i).coordinates.size(); ++j) {
 				int col = playerShipList.get(i).coordinates.get(j).column;
 				int row = playerShipList.get(i).coordinates.get(j).row;
+
+				// Remove this point from the ship
 				if (col == guess.column && row == guess.row) {
 					playerShipList.get(i).coordinates.remove(j);
+
+					/**
+					 * if there are no more coordinates, then the ship has been
+					 * sunk and we remove it from the playerShipList
+					 * */
 					if (playerShipList.get(i).coordinates.size() == 0) {
-						System.out.println(playerShipList.get(i).ship.name()
-								+ " has been sunk");
 						a.shipSunk = playerShipList.get(i).ship;
 						playerShipList.remove(i);
 						a.isHit = true;
@@ -58,6 +50,8 @@ public class GreedyGuessPlayer implements Player {
 
 	@Override
 	public Guess makeGuess() {
+
+		// Search through target mode unless it is empty
 		if (targetModeList.size() != 0) {
 			Guess g = targetModeList.pop();
 			return g;
@@ -88,6 +82,7 @@ public class GreedyGuessPlayer implements Player {
 
 	} // end of noRemainingShips()
 
+	// creates a list of all possible guesses and then randomises them
 	public LinkedList<Guess> getGuesses() {
 		LinkedList<Guess> guessList = new LinkedList<Guess>();
 
@@ -105,6 +100,10 @@ public class GreedyGuessPlayer implements Player {
 		return guessList;
 	}
 
+	/**
+	 * Creates new guesses to add to the targetModeList and removes the guesses
+	 * from the possibleGuessesList
+	 * */
 	private LinkedList<Guess> createTargetModeList(int col, int row) {
 		LinkedList<Guess> list = new LinkedList<>();
 		if (col > 0) {
@@ -112,28 +111,28 @@ public class GreedyGuessPlayer implements Player {
 			g.column = col - 1;
 			g.row = row;
 			list.add(g);
-			possibleGuesses = removeGuess(col, row);
+			possibleGuesses = removeGuess(g.column, g.row);
 		}
 		if (col < 9) {
 			Guess g = new Guess();
 			g.column = col + 1;
 			g.row = row;
 			list.add(g);
-			possibleGuesses = removeGuess(col, row);
+			possibleGuesses = removeGuess(g.column, g.row);
 		}
 		if (row > 0) {
 			Guess g = new Guess();
 			g.row = row - 1;
 			g.column = col;
 			list.add(g);
-			possibleGuesses = removeGuess(col, row);
+			possibleGuesses = removeGuess(g.column, g.row);
 		}
 		if (row < 9) {
 			Guess g = new Guess();
 			g.row = row + 1;
 			g.column = col;
 			list.add(g);
-			possibleGuesses = removeGuess(col, row);
+			possibleGuesses = removeGuess(g.column, g.row);
 		}
 		return list;
 	}
@@ -145,8 +144,6 @@ public class GreedyGuessPlayer implements Player {
 		g.column = col;
 		for (int i = 0; i < guesses.size(); ++i) {
 			if (guesses.get(i).column == col && guesses.get(i).row == row) {
-				
-				System.out.println("got removed "+guesses.size());
 				guesses.remove(i);
 			}
 		}
