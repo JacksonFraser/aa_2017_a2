@@ -12,12 +12,12 @@ public class MonteCarloGuessPlayer implements Player {
 	private LinkedList<Guess> possibleGuesses;
 	private LinkedList<Guess> FiveGuesses;
 	private LinkedList<Guess> FourGuesses;
+	private LinkedList<Guess> ThreeGuesses;
+	private LinkedList<Guess> TwoGuesses;
 	private LinkedList<Guess> otherGuesses;
 
 	private ArrayList<ShipLocation> playerShipList = new ArrayList<>();
 	private LinkedList<Guess> targetModeList = new LinkedList<Guess>();
-	private boolean start = false;
-	private boolean foundFive = false;
 
 	@Override
 	public void initialisePlayer(World world) {
@@ -70,7 +70,15 @@ public class MonteCarloGuessPlayer implements Player {
 			return g;
 		} else if(FourGuesses.size()!=0){
 			Guess g = FourGuesses.pop();
-			System.out.println("five start");
+			System.out.println("four start");
+			return g;
+		}else if(ThreeGuesses.size()!=0){
+			Guess g = ThreeGuesses.pop();
+			System.out.println("three start");
+			return g;
+		} else if(TwoGuesses.size()!=0){
+			Guess g = TwoGuesses.pop();
+			System.out.println("two start");
 			return g;
 		}
 		else{
@@ -116,7 +124,6 @@ public class MonteCarloGuessPlayer implements Player {
 			}
 		}
 		Collections.shuffle(guessList);
-    	//FiveGuesses = getFiveGuesses(guessList);
 
 		return guessList;
 	}
@@ -124,11 +131,14 @@ public class MonteCarloGuessPlayer implements Player {
 	public void getFiveGuesses() {
 		LinkedList<Guess> fiveList = new LinkedList<Guess>();
 		LinkedList<Guess> fourList = new LinkedList<Guess>();
-
+		LinkedList<Guess> threeList = new LinkedList<Guess>();
+		LinkedList<Guess> twoList = new LinkedList<Guess>();
 		LinkedList<Guess> otherList = new LinkedList<Guess>();
 
         int max = possibleGuesses.size();
     	for(int i = 0;i<max;i++){
+        	System.out.println(possibleGuesses.size());
+
     		Guess temp = possibleGuesses.pop();
     	    if(temp.row>=4&&temp.row<=5&&temp.column>=4&&temp.column<=5){
     	    	System.out.println(temp);
@@ -138,12 +148,22 @@ public class MonteCarloGuessPlayer implements Player {
     	    	System.out.println(temp);
     	    	fourList.add(temp);
     	    }
+     	    if(temp.row>=2&&temp.row<=7&&temp.column>=2&&temp.column<=7){
+    	    	System.out.println(temp);
+    	    	threeList.add(temp);
+    	    }
+    	    if(temp.row>=1&&temp.row<=8&&temp.column>=1&&temp.column<=8){
+    	    	System.out.println(temp);
+    	    	twoList.add(temp);
+    	    }
     	    
     	    else{otherList.add(temp);}
     	}
         otherGuesses = new LinkedList<Guess>(otherList);
         FourGuesses = new LinkedList<Guess>(fourList);
         FiveGuesses = new LinkedList<Guess>(fiveList);
+        ThreeGuesses = new LinkedList<Guess>(threeList);
+        TwoGuesses = new LinkedList<Guess>(twoList);
 
 	    
 		//Collections.shuffle(guessList);
@@ -157,6 +177,7 @@ public class MonteCarloGuessPlayer implements Player {
 	 * */
 	private LinkedList<Guess> createTargetModeList(int col, int row) {
 		LinkedList<Guess> list = new LinkedList<>();
+		
 		if (col > 0) {
 			Guess g = new Guess();
 			g.column = col - 1;

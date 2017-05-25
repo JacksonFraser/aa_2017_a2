@@ -10,6 +10,8 @@ import world.World.ShipLocation;
 public class GreedyGuessPlayer implements Player {
 
 	private LinkedList<Guess> possibleGuesses;
+	private LinkedList<Guess> passGuesses = new LinkedList<Guess>();
+
 	private ArrayList<ShipLocation> playerShipList = new ArrayList<>();
 	private LinkedList<Guess> targetModeList = new LinkedList<Guess>();
 	private boolean start = false;
@@ -60,7 +62,9 @@ public class GreedyGuessPlayer implements Player {
 			Guess g = targetModeList.pop();
 			return g;
 		} else {
+			
 			Guess g = possibleGuesses.pop();
+			
 			return g;
 
 		}
@@ -68,8 +72,10 @@ public class GreedyGuessPlayer implements Player {
 
 	@Override
 	public void update(Guess guess, Answer answer) {
-
+		
 		if (answer.isHit == true) {
+			possibleGuesses.add(guess);
+
 			targetModeList.addAll(createTargetModeList(guess.column, guess.row));
 		}
 
@@ -110,6 +116,7 @@ public class GreedyGuessPlayer implements Player {
 	 * */
 	private LinkedList<Guess> createTargetModeList(int col, int row) {
 		LinkedList<Guess> list = new LinkedList<>();
+
 		if (col > 0) {
 			Guess g = new Guess();
 			g.column = col - 1;
@@ -121,6 +128,9 @@ public class GreedyGuessPlayer implements Player {
 			Guess g = new Guess();
 			g.column = col + 1;
 			g.row = row;
+			if(guessExists(g)){
+				
+			}
 			list.add(g);
 			possibleGuesses = removeGuess(g.column, g.row);
 		}
@@ -138,21 +148,40 @@ public class GreedyGuessPlayer implements Player {
 			list.add(g);
 			possibleGuesses = removeGuess(g.column, g.row);
 		}
+		System.out.println(passGuesses.size());
+		for(int i =0;i<list.size();i++){
+			if(guessExists(list.get(i))){
+				list.remove(i);
+			};
+			
+		}
 		return list;
 	}
 
 	private LinkedList<Guess> removeGuess(int col, int row) {
 		LinkedList<Guess> guesses = possibleGuesses;
+		LinkedList<Guess> temp = new LinkedList<Guess>();
 		Guess g = new Guess();
 		g.row = row;
 		g.column = col;
 		for (int i = 0; i < guesses.size(); ++i) {
 			if (guesses.get(i).column == col && guesses.get(i).row == row) {
+				System.out.println(passGuesses.size());
+				temp.add(guesses.get(i));
 				guesses.remove(i);
 			}
 		}
-		Collections.shuffle(guesses);
+		passGuesses.addAll(temp);
+		
 		return guesses;
+	}
+	private boolean guessExists(Guess g){
+		for(int i = 0; i < passGuesses.size(); ++i){
+			if(passGuesses.get(i)== g){
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
