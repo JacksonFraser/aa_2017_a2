@@ -20,7 +20,7 @@ public class GreedyGuessPlayer implements Player {
 	public void initialisePlayer(World world) {
 		playerShipList = world.shipLocations;
     	possibleGuesses = getGuesses();
-    	System.out.println(possibleGuesses.size());
+    	//System.out.println(possibleGuesses.size());
 
 
 	} // end of initialisePlayer()
@@ -62,7 +62,9 @@ public class GreedyGuessPlayer implements Player {
 			Guess g = targetModeList.pop();
 			return g;
 		} else {
-			
+			if(passGuesses.size()!=0){
+				passGuesses.removeAll(passGuesses);
+			}
 			Guess g = possibleGuesses.pop();
 			
 			return g;
@@ -75,7 +77,6 @@ public class GreedyGuessPlayer implements Player {
 		
 		if (answer.isHit == true) {
 			possibleGuesses.add(guess);
-
 			targetModeList.addAll(createTargetModeList(guess.column, guess.row));
 		}
 
@@ -148,7 +149,7 @@ public class GreedyGuessPlayer implements Player {
 			list.add(g);
 			possibleGuesses = removeGuess(g.column, g.row);
 		}
-		System.out.println(passGuesses.size());
+		System.out.println("size of pass guess:"+passGuesses.size());
 		for(int i =0;i<list.size();i++){
 			if(guessExists(list.get(i))){
 				list.remove(i);
@@ -166,7 +167,6 @@ public class GreedyGuessPlayer implements Player {
 		g.column = col;
 		for (int i = 0; i < guesses.size(); ++i) {
 			if (guesses.get(i).column == col && guesses.get(i).row == row) {
-				System.out.println(passGuesses.size());
 				temp.add(guesses.get(i));
 				guesses.remove(i);
 			}
