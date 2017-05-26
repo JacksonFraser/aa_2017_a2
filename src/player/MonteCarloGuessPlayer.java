@@ -11,6 +11,7 @@ public class MonteCarloGuessPlayer implements Player {
 
 	private LinkedList<Guess> passGuesses = new LinkedList<Guess>();
 	private LinkedList<Guess> possibleGuesses;
+	private LinkedList<Guess> huntList = new LinkedList<Guess>() ;
 	private LinkedList<Guess> FiveGuesses;
 	private LinkedList<Guess> otherGuesses;
 	private LinkedList<GuessRisk> risklevel;
@@ -33,9 +34,11 @@ public class MonteCarloGuessPlayer implements Player {
 		possibleGuesses = getGuesses();
 		risklevel = setRisk();
 		System.out.println("riskList" + risklevel.size());
+		/*
 		for (int i = 0; i <= 30; i++) {
 			System.out.println("riskList a" + risklevel.get(i));
 		}
+		*/
 		// System.out.println(possibleGuesses.size());
 		//createGuessesLevel();
 		// System.out.println(FiveGuesses.size());
@@ -79,9 +82,9 @@ public class MonteCarloGuessPlayer implements Player {
 
 	@Override
 	public Guess makeGuess() {
-		System.out.println("risklevel = "+ risklevel.size());
+		//System.out.println("risklevel = "+ risklevel.size());
 		// Search through target mode unless it is empty
-		if (risklevel.size() != 0) {
+		    if (risklevel.size() != 0) {
 			GuessRisk R = new GuessRisk();
 			int risk = risklevel.get(0).risk;
 			for (int i = 0;i<risklevel.size();i++)
@@ -90,7 +93,6 @@ public class MonteCarloGuessPlayer implements Player {
 					risk = risklevel.get(i).risk;
 					R = risklevel.get(i);
 				}
-
 				
 			}
 			for (int j = 0;j<risklevel.size();j++)
@@ -112,6 +114,19 @@ public class MonteCarloGuessPlayer implements Player {
 	public void update(Guess guess, Answer answer) {
 		// if that guess find first hit point of a ship
 
+		if (answer.isHit != true) {
+			createReduceModeList(guess.column,guess.row);
+		}
+		
+		
+		
+		if (answer.isHit == true) {
+			createIncreaseModeList(guess.column, guess.row);
+		}
+		// if new target point is from a target has been searched
+		// chenck same line with out make a four point check;
+
+		
 		// To be implemented.
 	} // end of update()
 
@@ -181,6 +196,87 @@ public class MonteCarloGuessPlayer implements Player {
 		}
 		return guessList;
 	}
+	private LinkedList<Guess> createReduceModeList(int col, int row) {
+		LinkedList<Guess> list = new LinkedList<>();
+		int shipsize = 2 ;
+		for (int round = 0; round < playerShipList.size(); round++) {
+			shipsize = playerShipList.get(round).coordinates.size();{
+				for (int j=1;j<shipsize-1;j++){
+		if (col-j >= 0) {
+			Guess g = new Guess();
+			g.column = col-j;
+			g.row = row;
+			list.add(g);
+			reduceGuessRisk(g);			
+		}
+		if (col  + j <= 9) {
+			Guess g = new Guess();
+			g.column = col + j;
+			g.row = row;
+			list.add(g);
+			reduceGuessRisk(g);
+		}
+		if (row -j >= 0) {
+			Guess g = new Guess();
+			g.row = row +j ;
+			g.column = col;
+			list.add(g);
+			reduceGuessRisk(g);
+		}
+		if (row +j <= 9) {
+			Guess g = new Guess();
+			g.row = row  +j;
+			g.column = col;
+			list.add(g);
+			reduceGuessRisk(g);
+		}
+		}
+			}
+		}
+		return list;
+
+	}
+	private LinkedList<Guess> createIncreaseModeList(int col, int row) {
+		LinkedList<Guess> list = new LinkedList<>();
+		int shipsize = 2 ;
+		for (int round = 0; round < playerShipList.size(); round++) {
+			shipsize = playerShipList.get(round).coordinates.size();{
+				for (int j=1;j<shipsize-1;j++){
+		if (col-j >= 0) {
+			Guess g = new Guess();
+			g.column = col-j;
+			g.row = row;
+			list.add(g);
+			increaseGuessRisk(g);			
+		}
+		if (col  + j <= 9) {
+			Guess g = new Guess();
+			g.column = col + j;
+			g.row = row;
+			list.add(g);
+			increaseGuessRisk(g);
+		}
+		if (row -j >= 0) {
+			Guess g = new Guess();
+			g.row = row +j ;
+			g.column = col;
+			list.add(g);
+			increaseGuessRisk(g);
+		}
+		if (row +j <= 9) {
+			Guess g = new Guess();
+			g.row = row  +j;
+			g.column = col;
+			list.add(g);
+			increaseGuessRisk(g);
+		}
+		}
+			}
+		}
+		return list;
+
+	}
+	
 
 	/**
 	 * Creates new guesses to add to the targetModeList and removes the guesses
@@ -195,6 +291,7 @@ public class MonteCarloGuessPlayer implements Player {
 			g.row = row;
 			list.add(g);
 			possibleGuesses = removeGuess(g.column, g.row);
+			
 		}
 		if (col < 9) {
 			Guess g = new Guess();
@@ -264,6 +361,72 @@ public class MonteCarloGuessPlayer implements Player {
 		}
 		return false;
 	}
+	
+	
+	public LinkedList<Guess> checkMoreOnLine(Guess guess) {
+		LinkedList<Guess> highrisk = new LinkedList<>();
+		int shipsizecount=0;
+		int xRay = (targetGuess.row - guess.row);
+		int yRay = (targetGuess.column - guess.column);
+		//System.out.println(xRay+" "+yRay);
+		int x = guess.row - xRay;
+		int y = guess.column - yRay;
+		Guess temp = new Guess();
+		temp.row = x;
+		temp.column = y;
+     //   System.out.println("next target point is "+temp);
+		do {
+			//System.out.println("try="+highrisk.size());
+			shipsizecount++;
+			if (guessExists(temp)) {		
+				highrisk.add(temp);
+				//System.out.println("new highrisk first add="+highrisk.size());
+
+				removeGuess(y, x);
+				x =x- xRay;
+				y =y- yRay;
+				temp = new Guess();
+				temp.row = x;
+				temp.column = y;
+			} 
+			//if check point not on list, it has been used before,break this check
+			  else{
+				//	System.out.println("no pass="+highrisk.size());
+				break;}
+		} while (x == 0 || x == 9 || y == 0 || y == 9||shipsizecount>=Maxshipsize);
+
+		//System.out.println("new highrisk="+highrisk.size());
+		// add highrisk to targetlist
+		Collections.shuffle(highrisk);
+		return highrisk;
+	}
+	
+	
+	
+	public void setGuessRiskZero(Guess g){
+		for (int i = 0; i< risklevel.size();i++){
+		if(risklevel.get(i).column==g.column&&risklevel.get(i).row == g.row){
+			risklevel.get(i).risk=-5000;
+		}
+		}
+	}
+	public void reduceGuessRisk(Guess g){
+		for (int i = 0; i< risklevel.size();i++){
+		if(risklevel.get(i).column==g.column&&risklevel.get(i).row == g.row){
+			risklevel.get(i).risk-=5;
+			System.out.println("guesses/fires at row " + risklevel.get(i).row + " column " + risklevel.get(i).column + '.'+ risklevel.get(i).risk);
+		}
+		}
+	}
+	public void increaseGuessRisk(Guess g){
+		for (int i = 0; i< risklevel.size();i++){
+		if(risklevel.get(i).column==g.column&&risklevel.get(i).row == g.row){
+			risklevel.get(i).risk+=5;
+			System.out.println("guesses/fires at row " + risklevel.get(i).row + " column " + risklevel.get(i).column + '.'+ risklevel.get(i).risk);
+		}
+		}
+	}
+	
 
 }
 
