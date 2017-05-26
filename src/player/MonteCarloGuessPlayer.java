@@ -13,6 +13,8 @@ public class MonteCarloGuessPlayer implements Player {
 	private LinkedList<Guess> possibleGuesses;
 	private LinkedList<Guess> FiveGuesses;
 	private LinkedList<Guess> otherGuesses;
+	private LinkedList<Guess> risklevel;
+
 	// count which round make new monte carlo
 	private int count = 0;
 	// check if new hunt is from a target point
@@ -29,6 +31,11 @@ public class MonteCarloGuessPlayer implements Player {
 	public void initialisePlayer(World world) {
 		playerShipList = world.shipLocations;
 		possibleGuesses = getGuesses();
+		LinkedList<GuessRisk> riskList = setRisk();
+		System.out.println("riskList"+riskList.size());
+		for (int i =0;i<=30;i++){
+		System.out.println("riskList a"+riskList.get(i));
+		}
 		// System.out.println(possibleGuesses.size());
 		createGuessesLevel();
 		// System.out.println(FiveGuesses.size());
@@ -126,6 +133,46 @@ public class MonteCarloGuessPlayer implements Player {
 	} // end of noRemainingShips()
 
 	// creates a list of all possible guesses and then randomises them
+	public LinkedList<GuessRisk> setRisk() {
+		LinkedList<GuessRisk> guessList = new LinkedList<>();
+        int shipsize =2;
+		int max = 9;
+		for (int i = 0; i <= max; ++i) {
+			for (int j = 0; j <= max; ++j) {
+				GuessRisk guess = new GuessRisk();
+				guess.row = i;
+				guess.column = j;
+				guessList.add(guess);
+			}
+		}
+		for (int round = 0;round < playerShipList.size();round++)
+		{ shipsize = playerShipList.get(round).coordinates.size();
+
+		for(int i=0;i<guessList.size();i++){
+			int count =0;
+			if(guessList.get(i).row-(shipsize-1)>=0&&guessList.get(i).row+(shipsize-1)<=9){
+			    count+=shipsize;
+			}
+			else if(guessList.get(i).row+(shipsize-1)<=9){
+			count+=guessList.get(i).row+1;}
+			else if (guessList.get(i).row-(shipsize-1)>=0){
+				count+=10-guessList.get(i).row;}
+
+			if(guessList.get(i).column-(shipsize-1)>=0&&guessList.get(i).column+(shipsize-1)<=9){
+			    count+=shipsize;
+			}
+			else if(guessList.get(i).column+(shipsize-1)<=9){
+			count+=guessList.get(i).column+1;}
+			else if (guessList.get(i).column-(shipsize-1)>=0){
+				count+=10-guessList.get(i).column;}
+			guessList.get(i).risk +=count;
+		}
+		
+		}
+		return guessList;
+	}
+	
+	
 	public LinkedList<Guess> getGuesses() {
 		LinkedList<Guess> guessList = new LinkedList<Guess>();
 
@@ -138,8 +185,6 @@ public class MonteCarloGuessPlayer implements Player {
 				guessList.add(guess);
 			}
 		}
-		Collections.shuffle(guessList);
-
 		return guessList;
 	}
 
@@ -286,6 +331,9 @@ public class MonteCarloGuessPlayer implements Player {
 			}
 		}
 		return false;
+	}
+	private void updateCellCoordinates(){
+		
 	}
 
 
