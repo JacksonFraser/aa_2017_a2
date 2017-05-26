@@ -13,7 +13,7 @@ public class MonteCarloGuessPlayer implements Player {
 	private LinkedList<Guess> possibleGuesses;
 	private LinkedList<Guess> FiveGuesses;
 	private LinkedList<Guess> otherGuesses;
-	private LinkedList<Guess> risklevel;
+	private LinkedList<GuessRisk> risklevel;
 
 	// count which round make new monte carlo
 	private int count = 0;
@@ -21,23 +21,23 @@ public class MonteCarloGuessPlayer implements Player {
 	private boolean fromTragetGuess = false;
 	// save that targetGuess
 	private Guess targetGuess;
-	//the biggest ship a player have
-    private	int Maxshipsize = 3;
+	// the biggest ship a player have
+	private int Maxshipsize = 3;
 
 	private ArrayList<ShipLocation> playerShipList = new ArrayList<>();
-	private LinkedList<Guess> targetModeList = new LinkedList<Guess>();
+	//private LinkedList<Guess> targetModeList = new LinkedList<Guess>();
 
 	@Override
 	public void initialisePlayer(World world) {
 		playerShipList = world.shipLocations;
 		possibleGuesses = getGuesses();
-		LinkedList<GuessRisk> riskList = setRisk();
-		System.out.println("riskList"+riskList.size());
-		for (int i =0;i<=30;i++){
-		System.out.println("riskList a"+riskList.get(i));
+		risklevel = setRisk();
+		System.out.println("riskList" + risklevel.size());
+		for (int i = 0; i <= 30; i++) {
+			System.out.println("riskList a" + risklevel.get(i));
 		}
 		// System.out.println(possibleGuesses.size());
-		createGuessesLevel();
+		//createGuessesLevel();
 		// System.out.println(FiveGuesses.size());
 
 	} // end of initialisePlayer()
@@ -59,14 +59,14 @@ public class MonteCarloGuessPlayer implements Player {
 					 * sunk and we remove it from the playerShipList
 					 */
 					if (playerShipList.get(i).coordinates.size() == 0) {
-						a.shipSunk = playerShipList.get(i).ship;						
+						a.shipSunk = playerShipList.get(i).ship;
 						playerShipList.remove(i);
-                        for(i = 0;i < playerShipList.size();i++){
-                        	if(playerShipList.get(i).ship.len()>=Maxshipsize){
-                        		Maxshipsize = playerShipList.size();
-                        	}
-                        }
-                        System.out.println("ship suck"+a.shipSunk.name());
+						for (i = 0; i < playerShipList.size(); i++) {
+							if (playerShipList.get(i).ship.len() >= Maxshipsize) {
+								Maxshipsize = playerShipList.size();
+							}
+						}
+						System.out.println("ship suck" + a.shipSunk.name());
 						a.isHit = true;
 						return a;
 					}
@@ -79,45 +79,38 @@ public class MonteCarloGuessPlayer implements Player {
 
 	@Override
 	public Guess makeGuess() {
-		System.out.println(possibleGuesses.size());
+		System.out.println("risklevel = "+ risklevel.size());
 		// Search through target mode unless it is empty
-		if (targetModeList.size() != 0) {
-			Guess g = targetModeList.pop();
-			return g;
-		} else if (FiveGuesses.size() != 0) {
-			Guess g = FiveGuesses.pop();
-			// System.out.println("five start:"+count);
-			return g;
-		} else {
-			// start new monte carlo
-			count++;
-			createGuessesLevel();
-			Guess g = FiveGuesses.pop();
-			// System.out.println("five start:"+count);
+		if (risklevel.size() != 0) {
+			GuessRisk R = new GuessRisk();
+			int risk = risklevel.get(0).risk;
+			for (int i = 0;i<risklevel.size();i++)
+			{
+				if(risk < risklevel.get(i).risk){
+					risk = risklevel.get(i).risk;
+					R = risklevel.get(i);
+				}
+
+				
+			}
+			for (int j = 0;j<risklevel.size();j++)
+			{
+			 if(R.column==risklevel.get(j).column&&R.row==risklevel.get(j).row){
+				 risklevel.get(j).risk=0;
+			 }
+			}
+			Guess g = new Guess();
+			g.column = R.column;
+			g.row = R.row;
 			return g;
 		}
+		return null; 
 
 	} // end of makeGuess()
 
 	@Override
 	public void update(Guess guess, Answer answer) {
 		// if that guess find first hit point of a ship
-		if (answer.isHit == true && targetModeList.size() == 0) {
-			fromTragetGuess = true;
-			targetGuess = guess;
-			removeGuess(guess.column, guess.row);
-		//	System.out.println("old target from" + targetGuess);
-			targetModeList.addAll(createTargetModeList(guess.column, guess.row));
-			return;
-		}
-		// if new target point is from a target has been searched
-		// chenck same line with out make a four point check;
-		if (answer.isHit == true && fromTragetGuess == true) {
-			fromTragetGuess = false;
-			removeGuess(guess.column, guess.row);
-		//	System.out.println("new target from" + guess);
-			targetModeList.addAll(checkMoreOnLine(guess));
-		}
 
 		// To be implemented.
 	} // end of update()
@@ -135,7 +128,7 @@ public class MonteCarloGuessPlayer implements Player {
 	// creates a list of all possible guesses and then randomises them
 	public LinkedList<GuessRisk> setRisk() {
 		LinkedList<GuessRisk> guessList = new LinkedList<>();
-        int shipsize =2;
+		int shipsize = 2;
 		int max = 9;
 		for (int i = 0; i <= max; ++i) {
 			for (int j = 0; j <= max; ++j) {
@@ -145,31 +138,35 @@ public class MonteCarloGuessPlayer implements Player {
 				guessList.add(guess);
 			}
 		}
-		for(int i=0;i<guessList.size();i++){
-			int count =0;
-			if(guessList.get(i).row-(shipsize-1)>=0&&guessList.get(i).row+(shipsize-1)<=9){
-			    count+=shipsize;
-			}
-			else if(guessList.get(i).row+(shipsize-1)<=9){
-			count+=guessList.get(i).row+1;}
-			else if (guessList.get(i).row-(shipsize-1)>=0){
-				count+=10-guessList.get(i).row;}
+		for (int round = 0; round < playerShipList.size(); round++) {
+			shipsize = playerShipList.get(round).coordinates.size();
 
-			if(guessList.get(i).column-(shipsize-1)>=0&&guessList.get(i).column+(shipsize-1)<=9){
-			    count+=shipsize;
+			for (int i = 0; i < guessList.size(); i++) {
+				int count = 0;
+				if (guessList.get(i).row - (shipsize - 1) >= 0
+						&& guessList.get(i).row + (shipsize - 1) <= 9) {
+					count += shipsize;
+				} else if (guessList.get(i).row + (shipsize - 1) <= 9) {
+					count += guessList.get(i).row + 1;
+				} else if (guessList.get(i).row - (shipsize - 1) >= 0) {
+					count += 10 - guessList.get(i).row;
+				}
+
+				if (guessList.get(i).column - (shipsize - 1) >= 0
+						&& guessList.get(i).column + (shipsize - 1) <= 9) {
+					count += shipsize;
+				} else if (guessList.get(i).column + (shipsize - 1) <= 9) {
+					count += guessList.get(i).column + 1;
+				} else if (guessList.get(i).column - (shipsize - 1) >= 0) {
+					count += 10 - guessList.get(i).column;
+				}
+				guessList.get(i).risk += count;
 			}
-			else if(guessList.get(i).column+(shipsize-1)<=9){
-			count+=guessList.get(i).column+1;}
-			else if (guessList.get(i).column-(shipsize-1)>=0){
-				count+=10-guessList.get(i).column;}
-			guessList.get(i).risk +=count;
+
 		}
-		
-
 		return guessList;
 	}
-	
-	
+
 	public LinkedList<Guess> getGuesses() {
 		LinkedList<Guess> guessList = new LinkedList<Guess>();
 
@@ -183,71 +180,6 @@ public class MonteCarloGuessPlayer implements Player {
 			}
 		}
 		return guessList;
-	}
-
-	public void createGuessesLevel() {
-		LinkedList<Guess> highrisk = new LinkedList<>();
-		LinkedList<Guess> otherList = new LinkedList<>();
-		int max = possibleGuesses.size();
-		for (int i = 0; i < max; i++) {
-			// System.out.println(possibleGuesses.size());
-			// pick high risk guesses from possibleGuess
-			Guess temp = possibleGuesses.pop();
-			if (temp.row >= 4 - count && temp.row <= 5 + count && temp.column >= 4 - count
-					&& temp.column <= 5 + count) {
-				//System.out.println(temp);
-				highrisk.add(temp);
-			} else {
-				otherList.add(temp);
-			}
-		}
-		Collections.shuffle(highrisk);
-		Collections.shuffle(otherList);
-
-		// return other guesses back to other list
-		possibleGuesses = new LinkedList<Guess>(otherList);
-		FiveGuesses = new LinkedList<Guess>(highrisk);
-		//System.out.println("after creat possible Guesssize is "+ possibleGuesses.size());
-	}
-
-	// check same line , role not all complete
-	// only check 3 more point after once find
-	public LinkedList<Guess> checkMoreOnLine(Guess guess) {
-		LinkedList<Guess> highrisk = new LinkedList<>();
-		int shipsizecount=0;
-		int xRay = (targetGuess.row - guess.row);
-		int yRay = (targetGuess.column - guess.column);
-		//System.out.println(xRay+" "+yRay);
-		int x = guess.row - xRay;
-		int y = guess.column - yRay;
-		Guess temp = new Guess();
-		temp.row = x;
-		temp.column = y;
-     //   System.out.println("next target point is "+temp);
-		do {
-			//System.out.println("try="+highrisk.size());
-			shipsizecount++;
-			if (guessExists(temp)) {		
-				highrisk.add(temp);
-				//System.out.println("new highrisk first add="+highrisk.size());
-
-				removeGuess(y, x);
-				x =x- xRay;
-				y =y- yRay;
-				temp = new Guess();
-				temp.row = x;
-				temp.column = y;
-			} 
-			//if check point not on list, it has been used before,break this check
-			  else{
-				//	System.out.println("no pass="+highrisk.size());
-				break;}
-		} while (x == 0 || x == 9 || y == 0 || y == 9||shipsizecount>=Maxshipsize);
-
-		//System.out.println("new highrisk="+highrisk.size());
-		// add highrisk to targetlist
-		Collections.shuffle(highrisk);
-		return highrisk;
 	}
 
 	/**
@@ -303,33 +235,35 @@ public class MonteCarloGuessPlayer implements Player {
 			}
 		}
 		passGuesses.addAll(temp);
-		
+
 		return guesses;
 	}
 
 	private boolean guessExists(Guess g) {
 		for (int i = 0; i < possibleGuesses.size(); ++i) {
 
-			if (possibleGuesses.get(i).column == g.column&&possibleGuesses.get(i).row==g.row) {
-				//System.out.println("here"+g);
+			if (possibleGuesses.get(i).column == g.column
+					&& possibleGuesses.get(i).row == g.row) {
+				// System.out.println("here"+g);
 
 				return true;
 			}
 		}
 		return false;
 	}
+
 	private boolean guessExistsFromPass(Guess g) {
 		for (int i = 0; i < passGuesses.size(); ++i) {
 
-			if (possibleGuesses.get(i).column == g.column&&possibleGuesses.get(i).row==g.row) {
-				//System.out.println("here"+g);
+			if (possibleGuesses.get(i).column == g.column
+					&& possibleGuesses.get(i).row == g.row) {
+				// System.out.println("here"+g);
 
 				return true;
 			}
 		}
 		return false;
 	}
-
 
 }
 
@@ -362,6 +296,42 @@ public class MonteCarloGuessPlayer implements Player {
  * // Collections.shuffle(guessList);
  * 
  * }
+ * 
+ * 
+ * public void createGuessesLevel() { LinkedList<Guess> highrisk = new
+ * LinkedList<>(); LinkedList<Guess> otherList = new LinkedList<>(); int max =
+ * possibleGuesses.size(); for (int i = 0; i < max; i++) { //
+ * System.out.println(possibleGuesses.size()); // pick high risk guesses from
+ * possibleGuess Guess temp = possibleGuesses.pop(); if (temp.row >= 4 - count
+ * && temp.row <= 5 + count && temp.column >= 4 - count && temp.column <= 5 +
+ * count) { //System.out.println(temp); highrisk.add(temp); } else {
+ * otherList.add(temp); } } Collections.shuffle(highrisk);
+ * Collections.shuffle(otherList);
+ * 
+ * // return other guesses back to other list possibleGuesses = new
+ * LinkedList<Guess>(otherList); FiveGuesses = new LinkedList<Guess>(highrisk);
+ * //System.out.println("after creat possible Guesssize is "+
+ * possibleGuesses.size()); }
+ * 
+ * // check same line , role not all complete // only check 3 more point after
+ * once find public LinkedList<Guess> checkMoreOnLine(Guess guess) {
+ * LinkedList<Guess> highrisk = new LinkedList<>(); int shipsizecount=0; int
+ * xRay = (targetGuess.row - guess.row); int yRay = (targetGuess.column -
+ * guess.column); //System.out.println(xRay+" "+yRay); int x = guess.row - xRay;
+ * int y = guess.column - yRay; Guess temp = new Guess(); temp.row = x;
+ * temp.column = y; // System.out.println("next target point is "+temp); do {
+ * //System.out.println("try="+highrisk.size()); shipsizecount++; if
+ * (guessExists(temp)) { highrisk.add(temp);
+ * //System.out.println("new highrisk first add="+highrisk.size());
+ * 
+ * removeGuess(y, x); x =x- xRay; y =y- yRay; temp = new Guess(); temp.row = x;
+ * temp.column = y; } //if check point not on list, it has been used
+ * before,break this check else{ //
+ * System.out.println("no pass="+highrisk.size()); break;} } while (x == 0 || x
+ * == 9 || y == 0 || y == 9||shipsizecount>=Maxshipsize);
+ * 
+ * //System.out.println("new highrisk="+highrisk.size()); // add highrisk to
+ * targetlist Collections.shuffle(highrisk); return highrisk; }
  */
 
 // end of class MonteCarloGuessPlayer
