@@ -148,12 +148,20 @@ public class MonteCarloGuessPlayer implements Player {
 		for(int i=0;i<guessList.size();i++){
 			int count =0;
 			if(guessList.get(i).row-(shipsize-1)>=0&&guessList.get(i).row+(shipsize-1)<=9){
-			    count=+shipsize;
+			    count+=shipsize;
 			}
-			else if(guessList.get(i).column-(shipsize-1)>=0&&guessList.get(i).column+(shipsize-1)<=9){
-			    count=+shipsize;
+			else if(guessList.get(i).row+(shipsize-1)<=9){
+			count+=guessList.get(i).row+1;}
+			else if (guessList.get(i).row-(shipsize-1)>=0){
+				count+=10-guessList.get(i).row;}
+
+			if(guessList.get(i).column-(shipsize-1)>=0&&guessList.get(i).column+(shipsize-1)<=9){
+			    count+=shipsize;
 			}
-			else{count=+1;}
+			else if(guessList.get(i).column+(shipsize-1)<=9){
+			count+=guessList.get(i).column+1;}
+			else if (guessList.get(i).column-(shipsize-1)>=0){
+				count+=10-guessList.get(i).column;}
 			guessList.get(i).risk +=count;
 		}
 		
