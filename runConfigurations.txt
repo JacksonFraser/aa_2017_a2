@@ -1,6 +1,7 @@
+-v
 -l log.txt
-C:\Users\WD\git\aa_2017_a2\config.txt
-C:\Users\WD\git\aa_2017_a2\loc1.txt
-C:\Users\WD\git\aa_2017_a2\loc2.txt 
+H:\git\aa_2017_a2\config.txt
+H:\git\aa_2017_a2\loc1.txt
+H:\git\aa_2017_a2\loc2.txt 
 monte
 monte
